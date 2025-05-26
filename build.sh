@@ -104,25 +104,34 @@ build_all_images() {
     log_info "Starting imagifex build process..."
     echo "================================================="
     
-    # Define build order (common base first, then derivatives)
-    declare -A images=(
-        ["${IMAGE_PREFIX}-common"]="$BUILDS_DIR/common"
-        ["${IMAGE_PREFIX}-java"]="$BUILDS_DIR/java"
-        ["${IMAGE_PREFIX}-fullstack"]="$BUILDS_DIR/fullstack"
-        ["${IMAGE_PREFIX}-python"]="$BUILDS_DIR/python"
-        ["${IMAGE_PREFIX}-datascience"]="$BUILDS_DIR/datascience"
-    )
+    # Discover available builds dynamically (except common which goes first)
+    local builds=()
+    
+    # Always build common first as the base
+    if [ -d "$BUILDS_DIR/common" ] && [ -f "$BUILDS_DIR/common/Dockerfile" ]; then
+        builds+=("common")
+    else
+        log_error "Common build not found or missing Dockerfile"
+        return 1
+    fi
+    
+    # Discover other builds from the builds directory
+    for build_dir in "$BUILDS_DIR"/*; do
+        if [ -d "$build_dir" ] && [ -f "$build_dir/Dockerfile" ]; then
+            local build_name=$(basename "$build_dir")
+            # Skip common as it's already added
+            if [ "$build_name" != "common" ]; then
+                builds+=("$build_name")
+                log_info "Discovered build: $build_name"
+            fi
+        fi
+    done
     
     # Build images in order
-    for image_name in "${IMAGE_PREFIX}-common" "${IMAGE_PREFIX}-java" "${IMAGE_PREFIX}-fullstack" "${IMAGE_PREFIX}-python" "${IMAGE_PREFIX}-datascience"; do
-        local build_dir="${images[$image_name]}"
+    for build_name in "${builds[@]}"; do
+        local image_name="${IMAGE_PREFIX}-${build_name}"
+        local build_dir="$BUILDS_DIR/$build_name"
         local dockerfile="$build_dir/Dockerfile"
-        
-        if [ ! -f "$dockerfile" ]; then
-            log_error "Dockerfile not found: $dockerfile"
-            build_failed=1
-            continue
-        fi
         
         echo ""
         log_info "================================================="
