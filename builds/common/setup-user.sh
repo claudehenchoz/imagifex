@@ -10,8 +10,8 @@ echo "  Welcome to imagifex WSL2 Developer Environment"
 echo "=================================================="
 echo ""
 
-# Check if running as root or if user already exists
-if [ "$EUID" -eq 0 ] || [ "$(whoami)" != "root" ]; then
+# Check if running as root
+if [ "$EUID" -eq 0 ]; then
     echo "Setting up your user account..."
     echo ""
     
@@ -47,8 +47,11 @@ if [ "$EUID" -eq 0 ] || [ "$(whoami)" != "root" ]; then
     
     echo ""
     echo "User $username created successfully!"
-    echo "Please restart your WSL2 session to log in as $username."
+    echo "Switching to user $username..."
     echo ""
+    
+    # Switch to the new user and continue setup
+    exec su - "$username"
 else
     echo "User setup already completed or running in non-root context."
 fi

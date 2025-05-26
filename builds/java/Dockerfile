@@ -72,7 +72,13 @@ RUN echo '' >> /etc/skel/.bashrc && \
     echo 'alias java17="export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"' >> /etc/skel/.bashrc && \
     echo 'alias java21="export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64"' >> /etc/skel/.bashrc && \
     echo 'alias mvn-tree="mvn dependency:tree"' >> /etc/skel/.bashrc && \
-    echo 'alias mvn-clean="mvn clean compile"' >> /etc/skel/.bashrc
+    echo 'alias mvn-clean="mvn clean compile"' >> /etc/skel/.bashrc && \
+    echo '' >> /etc/skel/.bashrc && \
+    echo '# Run Java-specific setup if needed' >> /etc/skel/.bashrc && \
+    echo 'if [ ! -f ~/.imagifex-java-setup-complete ]; then' >> /etc/skel/.bashrc && \
+    echo '    /usr/local/bin/imagifex/java-setup.sh' >> /etc/skel/.bashrc && \
+    echo '    touch ~/.imagifex-java-setup-complete' >> /etc/skel/.bashrc && \
+    echo 'fi' >> /etc/skel/.bashrc
 
 # Create Maven local repository directory
 RUN mkdir -p /etc/skel/.m2

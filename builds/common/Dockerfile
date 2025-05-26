@@ -78,7 +78,6 @@ RUN echo '#!/bin/bash' > /etc/skel/.bashrc && \
     echo '' >> /etc/skel/.bashrc && \
     echo '# Run first-time setup if needed' >> /etc/skel/.bashrc && \
     echo 'if [ ! -f ~/.imagifex-setup-complete ]; then' >> /etc/skel/.bashrc && \
-    echo '    /usr/local/bin/imagifex/setup-user.sh' >> /etc/skel/.bashrc && \
     echo '    /usr/local/bin/imagifex/setup-env.sh' >> /etc/skel/.bashrc && \
     echo '    touch ~/.imagifex-setup-complete' >> /etc/skel/.bashrc && \
     echo 'fi' >> /etc/skel/.bashrc && \
